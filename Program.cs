@@ -1,7 +1,132 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Algorithms_and_Data_Structures
 {
+    public class Node<T>
+    {
+        public T Value { get; set; }
+        public Node<T> Next { get; set; }
+        public Node<T> Prev { get; set; }
+        public Node(T value)
+        {
+            Value = value;
+        }
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+    }
+
+    //Начальную и конечную ноду нужно хранить в самой реализации интерфейса
+    //public interface ILinkedList
+    //{
+    //    int GetCount(); // возвращает количество элементов в списке
+    //    void AddNode(int value);  // добавляет новый элемент списка
+    //    void AddNodeAfter(Node node, int value); // добавляет новый элемент списка после определённого элемента
+    //    void RemoveNode(int index); // удаляет элемент по порядковому номеру
+    //    void RemoveNode(Node node); // удаляет указанный элемент
+    //    Node FindNode(int searchValue); // ищет элемент по его значению
+    //}
+
+    class DoublyLinkedList<T> : IEnumerable<T>   //: ILinkedList
+    {
+        public Node<T> Head { get; set; }
+        public Node<T> Tail { get; set; }
+        public int count { get; set; }
+        public DoublyLinkedList() { } //создание пустого списка
+
+        public DoublyLinkedList(T value) // создание списка с 1 эллементом
+        {
+            var item = new Node<T>(value);
+            Head = item; //первый элемент
+            Tail = item; //последний элемент
+            count = 1;
+        }
+        public int GetCount() //возвращает количество элементов +
+        {
+            return count - 1;
+        }
+        public void AddNode(T value) //добавляет новый элемент в конец списка +
+        {
+            var item = new Node<T>(value);
+
+            if (count == 0)
+            {
+                Head = item; //первый элемент
+                Tail = item; //последний элемент
+                count = 1;
+            }
+
+            Tail.Next = item; //ссылка с последенго элемента на новый элемент
+            item.Prev = Tail; //ссылка с нового элемента на старый элемент
+            Tail = item;      //последний элемент
+            count++;
+        }
+
+        public void AddNodeAfter(Node<T> node, T value) //добавляем элемент списка после определённого значения
+        {
+            var newNode = new Node<T>(value); //ссылка на новый элемент
+            var nextItem = node.Next; //запоминаем ссылку на следующей элемент перед которым вставляем новый
+            node.Next = newNode; //ставим ссылку на новый элемент
+            newNode.Next = nextItem; //новому элементу даём ссылку на следующий перед которым вставили
+            count++;
+        }
+
+        public void RemoveNodeIndex(int index) //удаляет элемент под данным номером
+        {
+            var current = Head;
+            for (int i = 1; i <= index; i++)
+            {
+                if (i.Equals(index))
+                {
+                    current.Prev.Next = current.Next;
+                    current.Next.Prev = current.Prev;
+                    count--;
+                    return;
+                }
+                current = current.Next;
+            }
+        }
+
+        public void RemoveItem(T value) // удаление указанного элемента
+        {
+            var current = Head;
+            while (current != null)
+            {
+                if (current.Value.Equals(value))
+                {
+                    current.Prev.Next = current.Next;
+                    current.Next.Prev = current.Prev;
+                    count--;
+                    return;
+                }
+                current = current.Next;
+            }
+        }
+        // чё т не понял, мне тут нужно вывести элемент не под каким-то номером, а с таким же значением?
+        //public Node FindNode(int searchValue)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public IEnumerator GetEnumerator() // так, ну это вроде возвращает списком все элементы
+        {
+            var current = Head;
+            while (current != null)
+            {
+                yield return current;
+                current = current.Next;
+            }
+        }
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() // а, что делает это я вообще хз
+        {
+            return (IEnumerator<T>)GetEnumerator();
+        }
+    }
+
     class Program
     {
         static void Cleaning(string text)
@@ -11,161 +136,65 @@ namespace Algorithms_and_Data_Structures
                 Console.Clear();
             }
         }
+        public static int count;
 
-        #region 1 задание
-        //static int count = 0;
-        static void PrimeNumber(int number)
+        static int BinSearch(int[] inputArray, int searchValue)
         {
-            int i = 2;
-            int d = 0;
-
-            while (i < number)
+            Array.Sort(inputArray);
+            int min = 0;
+            int max = inputArray.Length - 1;
+            count = 1;
+            while (min <= max)
             {
-                if (number % i == 0)
+                int mid = (min + max) / 2;
+                if (inputArray[mid] == searchValue)
                 {
-                    d++;
+                    return mid;
                 }
-                i++;
-            }
-            if (d == 0)
-            {
-                Console.Write($"Число {number} простое.   ");
-            }
-            else
-            {
-                Console.Write($"Число {number} не простое.   ");
-            }
-
-
-            #region Забыл, что надо было по блоксхеме, но удалять жалко поэтому просто закомичу и добавлю в регион
-
-            //if (number <= 1)
-            //{
-            //    Console.WriteLine("Простых чисел до этого числа не имеется");
-            //    return;
-            //}
-
-            //for (int i = 0; i <= number; i++)
-            //{
-            //    count = 0;
-            //    for (int j = 1; j <= i; j++)
-            //    {
-            //        if (i % j == 0)
-            //        {
-            //            ++count;
-            //        }
-            //    }
-            //    if (count == 2)
-            //    {
-            //        Console.Write(i + " ");
-            //    }
-
-            //}
-            //Console.WriteLine();
-
-            #endregion
-        }
-        #endregion
-
-        #region 2 задание
-        //не особо понял насчёт второго но ответ: О(N*N*N)
-        public static int StrangeSum(int[] inputArray)
-        {
-            int sum = 0;
-            for (int i = 0; i < inputArray.Length; i++)
-            {
-                for (int j = 0; j < inputArray.Length; j++)
+                else if (inputArray[mid] < searchValue)
                 {
-                    for (int k = 0; k < inputArray.Length; k++)
-                    {
-                        int y = 0;
-
-                        if (j != 0)
-                        {
-                            y = k / j;
-                        }
-
-                        sum += inputArray[i] + i + k + j + y;
-                        Console.Write(sum + " ");
-                    }
-                    Console.Write("\n" + sum + " ");
+                    min = mid + 1;
                 }
-                Console.Write("\n" + sum + " ");
+                else
+                {
+                    max = mid - 1;
+                }
+                count++;
             }
-            Console.Write("\n" + sum + " ");
-
-            return sum;
+            return -1;
         }
-        #endregion
-
-        #region 3 задание
-        //Рекурсия
-        static int FibbonachiRc(int n)
-        {
-            return (n == 1 || n == 0) ? 1 : FibbonachiRc(n - 1) + FibbonachiRc(n - 2);
-        }
-        //Метод
-        static int FibbonachiMe(int n)
-        {
-            int fib1;
-            int fib2 = 1;
-            int fibbonachi = 0;
-
-            for (int i = 0; i <= n; i++)
-            {
-                fib1 = fib2;
-                fib2 = fibbonachi;
-                fibbonachi = fib1 + fib2;
-            }
-            return fibbonachi;
-        }
-
-        #endregion
 
         static void Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Green;
 
-            #region 1 задание проверка
-            PrimeNumber(2);
-            PrimeNumber(7);
-            PrimeNumber(14);
-            PrimeNumber(52);
-            PrimeNumber(101);
+            var duplexList = new DoublyLinkedList<int>();
+            duplexList.AddNode(1);
+            duplexList.AddNode(2);
+            duplexList.AddNode(3);
+            duplexList.AddNode(3);
+            duplexList.AddNode(4);
+            duplexList.AddNode(5);
 
-            //Проверочные значения
-            Console.Write("\nЧисло 2 простое.   Число 7 простое.   Число 14 не простое.   Число 52 не простое.   Число 101 простое.");
+            duplexList.RemoveItem(4);
+            duplexList.RemoveNodeIndex(2);
 
-            #region это проверка к тому что сделал без схемы
-
-            ////Пропишите значение до которого надо показать простые числа
-            //PrimeNumber(200);
-
-            ////значения в массиве взяты из гугла по поиску "простые числа"
-            //int[] arr = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199 };
-
-            //for (int i = 0; i < arr.Length; i++)
-            //{
-            //    Console.Write(arr[i] + " ");
-            //}
-            //Console.WriteLine();
-
-            #endregion
-            #endregion
+            foreach (var item in duplexList)
+            {
+                Console.WriteLine(item);
+            }
+            Console.WriteLine("Количество элементов: " + duplexList.GetCount());
 
             Console.WriteLine("\nДля очичения консоли напишите: очистить");
             Cleaning(Console.ReadLine());
 
-            #region 3 задание проверка
-            //Рекурсия
-            Console.WriteLine("Тут придётся подождать т.к. рекурсия ооооооооооочень медленная");
-            Console.WriteLine(FibbonachiRc(5) + " " + FibbonachiRc(15) + " " + FibbonachiRc(28) + " " + FibbonachiRc(37) + " " + FibbonachiRc(45));
-            //Метод
-            Console.WriteLine(FibbonachiMe(5) + " " + FibbonachiMe(15) + " " + FibbonachiMe(28) + " " + FibbonachiMe(37) + " " + FibbonachiMe(45));
-            //Что должно вывести
-            Console.WriteLine("8 987 514229 39088169 1836311903");
+            int[] arr = { 123, 41, 654, 078, 12, 48, 63636, 6464, 687, 98, 868768, 69, 434, 4343, 2844531, 873438, 483 };
+            Console.WriteLine(BinSearch(arr, 69) + $"\nНа {count} ходе нашлось нужное значение");
+            Console.WriteLine(BinSearch(arr, 873438) + $"\nНа {count} ходе нашлось нужное значение");
+            Console.WriteLine(BinSearch(arr, 999) + "\nИскомого значения нет");
+            Console.WriteLine("Асимптотическая сложность О(log(n))");
 
-            #endregion
+
         }
     }
 }
