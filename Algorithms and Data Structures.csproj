@@ -6,4 +6,8 @@
     <RootNamespace>Algorithms_and_Data_Structures</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+  </ItemGroup>
+
 </Project>
